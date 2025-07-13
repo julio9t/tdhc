@@ -1,32 +1,23 @@
-# This is a basic workflow to help you get started with Actions
+# Use Ubuntu as base image
+FROM ubuntu:22.04
 
-name: Node.js CD
+# Prevent interactive prompts during package install
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Controls when the action will run. 
-on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    branches: [ master ]
+# Update and install some common tools
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    vim \
+    python3 \
+    python3-pip \
+    && apt-get clean
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+# Optional: Clone a GitHub repo inside the image
+RUN git clone https://github.com/your-username/your-repo.git /opt/your-repo
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    - name: Deploy using ssh
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        port: 22
-        script: |
-          cd ~/home/danielwetan/apps/node1
-          git pull origin master
-          git status
-          npm install --only=prod
-          pm2 restart node1
+# Set working directory
+WORKDIR /opt/your-repo
+
+# Example: run a script on container start
+CMD ["bash"]
